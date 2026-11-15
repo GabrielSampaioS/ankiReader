@@ -13,6 +13,11 @@
   <title>Anki Reader</title>
 
   <link rel="stylesheet" href="/style.css" />
+
+  <link
+  rel="stylesheet"
+  href="/vendor/pdfjs/web/pdf_viewer.css"
+/>
 </head>
 
 <body>
@@ -151,24 +156,27 @@
 
     </header>
 
-    <main id="stage" class="reader-stage">
+   <main id="stage" class="reader-stage">
 
-      <canvas id="page-canvas"></canvas>
+  <canvas id="page-canvas"></canvas>
 
-      <!-- Zonas de navegação -->
-      <button
-        class="edge edge-left"
-        id="left-zone"
-        aria-label="Página anterior"
-      ></button>
+  <!-- Camada de texto selecionável -->
+  <div id="text-layer" class="textLayer"></div>
 
-      <button
-        class="edge edge-right"
-        id="right-zone"
-        aria-label="Próxima página"
-      ></button>
+  <!-- Zonas de navegação -->
+  <button
+    class="edge edge-left"
+    id="left-zone"
+    aria-label="Página anterior"
+  ></button>
 
-    </main>
+  <button
+    class="edge edge-right"
+    id="right-zone"
+    aria-label="Próxima página"
+  ></button>
+
+</main>
 
   </section>
 

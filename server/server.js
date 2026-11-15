@@ -16,6 +16,15 @@ if (!fs.existsSync(PDFJS_BUILD)) {
 app.use(express.static(path.join(ROOT, "public")));
 app.use("/src", express.static(path.join(ROOT, "src")));
 
+
+// Disponibiliza o PDF.js e o Worker localmente.
+app.use("/vendor/pdfjs", express.static(PDFJS_BUILD));
+
+// Disponibiliza os arquivos CSS do PDF.js.
+app.use(
+  "/vendor/pdfjs/web",
+  express.static(path.join(ROOT, "vendor", "pdfjs", "web"))
+);
 // Disponibiliza o PDF.js e o Worker localmente (necessário para uso offline).
 app.use("/vendor/pdfjs", express.static(PDFJS_BUILD));
 

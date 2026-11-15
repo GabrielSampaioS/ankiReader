@@ -155,6 +155,7 @@ Cada livro é representado inicialmente por um objeto:
   id: "book-001",
   name: "english-book.pdf",
   file: Blob,
+  cover
   currentPage: 1,
   createdAt: Date.now()
 }
@@ -167,6 +168,7 @@ Cada livro é representado inicialmente por um objeto:
 | `id` | Identificador único do livro |
 | `name` | Nome original do arquivo |
 | `file` | Conteúdo binário do PDF |
+| `cover` | Primeira página utilizado como capa |
 | `currentPage` | Última página visitada |
 | `createdAt` | Data de importação |
 

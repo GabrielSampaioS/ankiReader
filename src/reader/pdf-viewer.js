@@ -16,11 +16,14 @@ export class PdfViewer {
   #page = 1;
   #renderToken = 0;
   #task = null;
+  #textLayerContainer;
+  #textLayer;
 
   constructor({ container, canvas, onPageChange = () => {} }) {
     this.#container = container;
     this.#canvas = canvas;
     this.#onPageChange = onPageChange;
+    this.#textLayerContainer = this.#canvas.parentElement.querySelector("#text-layer");
   }
 
   get page() {
@@ -96,56 +99,109 @@ export class PdfViewer {
     return clampPage(page, this.numPages);
   }
 
-  async #render() {
-    const token = ++this.#renderToken;
+ async #render() {
+  const token = ++this.#renderToken;
 
-    // Evita renderizações duplicadas no mesmo canvas.
-    if (this.#task) {
-      this.#task.cancel();
-      try {
-        await this.#task.promise;
-      } catch {}
-      this.#task = null;
-    }
-    if (token !== this.#renderToken) return;
+  // Limpa a camada de texto anterior.
+  if (this.#textLayer) {
+    this.#textLayer.cancel();
+    this.#textLayer = null;
+  }
 
-    const page = await this.#pdf.getPage(this.#page);
-    if (token !== this.#renderToken) return;
+  this.#textLayerContainer.innerHTML = "";
 
-    const availableWidth = this.#container.clientWidth;
-    const availableHeight = this.#container.clientHeight;
-    if (!availableWidth || !availableHeight) return;
-
-    // Escala que faz a página inteira caber, sem rolagem.
-    const base = page.getViewport({ scale: 1 });
-    const fitScale = computeFitScale({
-      availableWidth,
-      availableHeight,
-      pageWidth: base.width,
-      pageHeight: base.height,
-    });
-
-    // Resolução extra para telas de alta densidade (Galaxy Tab).
-    const dpr = window.devicePixelRatio || 1;
-    const viewport = page.getViewport({ scale: fitScale * dpr });
-
-    this.#canvas.width = Math.floor(viewport.width);
-    this.#canvas.height = Math.floor(viewport.height);
-    this.#canvas.style.width = `${Math.floor(viewport.width / dpr)}px`;
-    this.#canvas.style.height = `${Math.floor(viewport.height / dpr)}px`;
-
-    const task = page.render({
-      canvasContext: this.#canvas.getContext("2d"),
-      viewport,
-    });
-    this.#task = task;
+  // Evita renderizações duplicadas no mesmo canvas.
+  if (this.#task) {
+    this.#task.cancel();
 
     try {
-      await task.promise;
-    } catch (error) {
-      if (error?.name !== "RenderingCancelledException") throw error;
-    } finally {
-      if (this.#task === task) this.#task = null;
+      await this.#task.promise;
+    } catch {}
+
+    this.#task = null;
+  }
+
+  if (token !== this.#renderToken) return;
+
+  const page = await this.#pdf.getPage(this.#page);
+
+  if (token !== this.#renderToken) return;
+
+  // Extrai o conteúdo textual da página.
+  const textContent = await page.getTextContent();
+
+  if (token !== this.#renderToken) return;
+
+  // Calcula o espaço disponível.
+  const availableWidth = this.#container.clientWidth;
+  const availableHeight = this.#container.clientHeight;
+
+  if (!availableWidth || !availableHeight) return;
+
+  // Calcula a escala para ajustar a página ao container.
+  const base = page.getViewport({ scale: 1 });
+
+  const fitScale = computeFitScale({
+    availableWidth,
+    availableHeight,
+    pageWidth: base.width,
+    pageHeight: base.height,
+  });
+
+  // Viewport em tamanho CSS.
+  const viewport = page.getViewport({
+    scale: fitScale,
+  });
+
+  // Resolução extra para telas de alta densidade.
+  const dpr = window.devicePixelRatio || 1;
+
+  this.#canvas.width = Math.floor(viewport.width * dpr);
+  this.#canvas.height = Math.floor(viewport.height * dpr);
+
+  this.#canvas.style.width = `${Math.floor(viewport.width)}px`;
+  this.#canvas.style.height = `${Math.floor(viewport.height)}px`;
+
+  // Renderiza o Canvas.
+  const task = page.render({
+    canvasContext: this.#canvas.getContext("2d"),
+    viewport,
+    transform: dpr !== 1
+      ? [dpr, 0, 0, dpr, 0, 0]
+      : null,
+  });
+
+  this.#task = task;
+
+  try {
+    await task.promise;
+  } catch (error) {
+    if (error?.name !== "RenderingCancelledException") {
+      throw error;
+    }
+  } finally {
+    if (this.#task === task) {
+      this.#task = null;
     }
   }
-}
+
+  if (token !== this.#renderToken) return;
+
+  // Cria a camada de texto selecionável.
+  const textLayer = new pdfjsLib.TextLayer({
+    container: this.#textLayerContainer,
+    textContentSource: textContent,
+    viewport,
+  });
+
+  this.#textLayer = textLayer;
+
+  try {
+    await textLayer.render();
+  } catch (error) {
+    if (token !== this.#renderToken) return;
+    throw error;
+  }
+
+  if (token !== this.#renderToken) return;
+}}
