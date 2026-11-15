@@ -37,11 +37,13 @@ test("saveBook cria o registro com os valores iniciais esperados", async ({ page
         type: "application/pdf",
       });
       const before = Date.now();
-      const saved = await storage.saveBook(file);
+      const saved = await storage.saveBook(file, arg.cover);
       return {
         id: saved.id,
         name: saved.name,
         currentPage: saved.currentPage,
+        cover: saved.cover,
+        isCoverBlob: saved.cover instanceof Blob,
         isBlob: saved.file instanceof Blob,
         size: saved.file.size,
         createdAtOk: saved.createdAt >= before && saved.createdAt <= Date.now(),
@@ -54,6 +56,7 @@ test("saveBook cria o registro com os valores iniciais esperados", async ({ page
   expect(book.name).toBe("a.pdf");
   expect(book.currentPage).toBe(1);
   expect(book.isBlob).toBe(true);
+  expect(book.isCoverBlob).toBe(true);;
   expect(book.size).toBe(arg.bytes.length);
   expect(book.createdAtOk).toBe(true);
 });

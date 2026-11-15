@@ -23,8 +23,8 @@ test.describe("biblioteca", () => {
 
     await expect(page.locator("#empty-message")).toBeHidden();
     await expect(page.locator("#book-list li")).toHaveCount(1);
-    await expect(page.locator("#book-list .name")).toHaveText("english-book.pdf");
-    await expect(page.locator("#book-list .meta")).toHaveText("Página atual: 1");
+    await expect(page.locator("#book-list .book-name")).toHaveText("english-book.pdf");
+    await expect(page.locator("#book-list .book-meta")).toHaveText("Página atual: 1");
   });
 
   test("o PDF fica salvo no navegador (IndexedDB), não só na tela", async ({ page }) => {
@@ -57,7 +57,7 @@ test.describe("biblioteca", () => {
     await importPdf(page, pdfFile("sobrevive.pdf"));
     await page.reload();
 
-    await expect(page.locator("#book-list .name")).toHaveText("sobrevive.pdf");
+    await expect(page.locator("#book-list .book-name")).toHaveText("sobrevive.pdf");
   });
 
   test("vários livros: o mais recente aparece primeiro", async ({ page }) => {
@@ -65,7 +65,7 @@ test.describe("biblioteca", () => {
     await page.waitForTimeout(10);
     await importPdf(page, pdfFile("novo.pdf"));
 
-    await expect(page.locator("#book-list .name")).toHaveText(["novo.pdf", "antigo.pdf"]);
+    await expect(page.locator("#book-list .book-name")).toHaveText(["novo.pdf", "antigo.pdf"]);
   });
 
   test("arquivo que não é PDF é recusado e nada é salvo", async ({ page }) => {
@@ -129,9 +129,9 @@ test.describe("abertura do livro", () => {
       mimeType: "application/pdf",
       buffer: Buffer.from("isto não é um PDF válido"),
     });
-    await page.locator("#book-list li button").first().click();
+    await page.locator("#import-label").first().click();
 
-    await expect.poll(() => dialogs).toContain("Não foi possível abrir este PDF.");
+    await expect.poll(() => dialogs).toContain("Não foi possível importar este arquivo.");
     await expect(page.locator("#reader")).toBeHidden();
     await expect(page.locator("#library-view")).toBeVisible();
   });

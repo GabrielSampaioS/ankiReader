@@ -2,6 +2,7 @@ const DB_NAME = "anki-reader";
 const DB_VERSION = 1;
 const STORE_NAME = "books";
 
+
 function openDatabase() {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);

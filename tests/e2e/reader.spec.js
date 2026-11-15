@@ -181,7 +181,7 @@ test.describe("progresso de leitura", () => {
 
     await page.locator("#back-button").click();
 
-    await expect(page.locator("#book-list .meta")).toHaveText("Página atual: 2");
+    await expect(page.locator("#book-list .book-meta")).toHaveText("Página atual: 2");
   });
 
   test("reabrir o livro retoma da última página", async ({ page }) => {
@@ -206,7 +206,7 @@ test.describe("progresso de leitura", () => {
     await expect.poll(() => storedPage(page)).toBe(3);
 
     await page.reload();
-    await expect(page.locator("#book-list .meta")).toHaveText("Página atual: 3");
+    await expect(page.locator("#book-list .book-meta")).toHaveText("Página atual: 3");
     await openFirstBook(page);
 
     await expectRenderedPage(expect, page, 3);

@@ -13,7 +13,7 @@ function pdfFile(name = "livro.pdf", options) {
 async function importPdf(page, file) {
   await page.locator("#file-input").setInputFiles(file);
   await page
-    .locator("#book-list .name", { hasText: file.name })
+    .locator("#book-list .book-name", { hasText: file.name })
     .first()
     .waitFor();
 }
@@ -70,6 +70,7 @@ function readStoredBooks(page) {
       id: b.id,
       name: b.name,
       currentPage: b.currentPage,
+      cover: b.cover,
       isBlob: b.file instanceof Blob,
       size: b.file.size,
     }));
@@ -86,8 +87,16 @@ function collectErrors(page) {
   return errors;
 }
 
+/** Gerar capa para teste **/
+const cover = new Blob(["imagem de teste"], {
+  type: "image/png",
+});
+
+
+
 module.exports = {
   pdfFile,
+  cover,
   importPdf,
   openFirstBook,
   waitForRender,
