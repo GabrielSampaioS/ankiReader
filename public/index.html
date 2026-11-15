@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  />
+
+  <meta name="theme-color" content="#f5f5f2" />
+
+  <title>Anki Reader</title>
+
+  <link rel="stylesheet" href="/style.css" />
+</head>
+
+<body>
+
+  <!-- BIBLIOTECA -->
+  <div id="library-view" class="library">
+
+    <header id="app-header" class="app-header">
+      <div class="brand">
+        <div class="brand-icon">A</div>
+
+        <div class="brand-info">
+          <h1>Anki Reader</h1>
+          <span>Read. Understand. Remember.</span>
+        </div>
+      </div>
+
+      <label class="file-label" id="import-label">
+        <span class="import-icon">+</span>
+        <span>Importar livro</span>
+
+        <input
+          type="file"
+          id="file-input"
+          accept="application/pdf"
+        />
+      </label>
+    </header>
+
+    <main class="library-content">
+
+      <section class="library-heading">
+        <div>
+          <span class="eyebrow">SUA COLEÇÃO</span>
+          <h2>Minha biblioteca</h2>
+          <p>Seus livros, seu ritmo de aprendizado.</p>
+        </div>
+      </section>
+
+      <section class="books-section">
+
+        <div class="section-heading">
+          <h3>Todos os livros</h3>
+          <span class="section-caption">Sua biblioteca pessoal</span>
+        </div>
+
+        <ul id="book-list" class="book-grid">
+          <!--
+            Os livros serão adicionados dinamicamente
+            pelo JavaScript.
+          -->
+        </ul>
+
+        <div id="empty-message" class="empty-state hidden">
+          <div class="empty-icon">⌑</div>
+
+          <h3>Sua biblioteca está vazia</h3>
+
+          <p>
+            Importe seu primeiro PDF e comece
+            a construir seu vocabulário.
+          </p>
+
+          <label class="file-label empty-import">
+            <span>+ Importar primeiro livro</span>
+            <input
+              type="file"
+              accept="application/pdf"
+              onchange="document.querySelector('#file-input').files = this.files; document.querySelector('#file-input').dispatchEvent(new Event('change', { bubbles: true }));"
+            />
+          </label>
+        </div>
+
+      </section>
+
+    </main>
+
+    <footer class="library-footer">
+      <span>Anki Reader</span>
+      <span>Um espaço para aprender através da leitura.</span>
+    </footer>
+
+  </div>
+
+
+  <!-- LEITOR DE PDF -->
+  <section id="reader" class="reader hidden">
+
+    <header id="reader-bar" class="reader-toolbar">
+
+      <button
+        class="back-button secondary"
+        id="back-button"
+        aria-label="Voltar para biblioteca"
+      >
+        <span>←</span>
+        <span class="back-label">Biblioteca</span>
+      </button>
+
+      <div class="reader-document">
+        <span class="document-indicator"></span>
+        <span id="reader-title" class="reader-title"></span>
+      </div>
+
+      <div class="reader-navigation">
+
+        <button
+          class="navigation-button"
+          id="prev-button"
+          aria-label="Página anterior"
+        >
+          ‹
+        </button>
+
+        <div class="page-counter">
+          <input
+            type="number"
+            id="page-input"
+            min="1"
+            value="1"
+            aria-label="Página atual"
+          />
+
+          <span id="page-total">/ 1</span>
+        </div>
+
+        <button
+          class="navigation-button"
+          id="next-button"
+          aria-label="Próxima página"
+        >
+          ›
+        </button>
+
+      </div>
+
+    </header>
+
+    <main id="stage" class="reader-stage">
+
+      <canvas id="page-canvas"></canvas>
+
+      <!-- Zonas de navegação -->
+      <button
+        class="edge edge-left"
+        id="left-zone"
+        aria-label="Página anterior"
+      ></button>
+
+      <button
+        class="edge edge-right"
+        id="right-zone"
+        aria-label="Próxima página"
+      ></button>
+
+    </main>
+
+  </section>
+
+  <script type="module" src="/app.js"></script>
+
+</body>
+</html>
