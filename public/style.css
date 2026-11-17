@@ -802,3 +802,156 @@ body.reading {
   user-select: text;
   -webkit-user-select: text;
 }
+
+
+/* ========================================
+   CARTÃO DO ANKI (painel ao selecionar texto)
+======================================== */
+
+/* Sobreposto ao leitor: não pode ocupar espaço no layout, senão o palco
+   encolhe e a página é redesenhada, perdendo a seleção. */
+.card-panel {
+  position: absolute;
+  z-index: 6;
+
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+
+  width: min(560px, calc(100% - 24px));
+  max-height: calc(100% - 90px);
+  overflow-y: auto;
+
+  display: grid;
+  gap: 10px;
+
+  padding: 14px 16px;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+}
+
+.card-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-panel-header h2 {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.card-close {
+  width: 32px;
+  height: 32px;
+
+  color: var(--text-secondary);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+
+  font-size: 22px;
+  line-height: 1;
+}
+
+.card-close:hover {
+  background: var(--surface-secondary);
+}
+
+.card-field {
+  display: grid;
+  gap: 5px;
+}
+
+.card-field > span {
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.card-field em {
+  font-style: normal;
+  font-weight: 500;
+  text-transform: none;
+}
+
+.card-field input,
+.card-field textarea {
+  width: 100%;
+  font-family: inherit;
+  padding: 9px 11px;
+
+  color: var(--text-primary);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+
+  /* 16px evita o zoom automático ao focar o campo em celulares. */
+  font-size: 16px;
+  line-height: 1.4;
+
+  resize: vertical;
+}
+
+.card-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.card-context {
+  padding: 8px 10px;
+
+  color: var(--text-secondary);
+  background: var(--surface-secondary);
+  border-radius: var(--radius-sm);
+
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.card-primary {
+  padding: 10px 16px;
+
+  color: white;
+  background: var(--accent);
+  border: 0;
+  border-radius: var(--radius-sm);
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.card-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.card-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.card-hint,
+.card-status {
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.card-status:empty {
+  display: none;
+}
