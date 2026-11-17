@@ -181,6 +181,59 @@
 
 </main>
 
+    <!-- Painel de cartão do Anki (aparece ao selecionar texto) -->
+    <aside id="card-panel" class="card-panel hidden" aria-label="Novo cartão do Anki">
+
+      <header class="card-panel-header">
+        <h2>Novo cartão</h2>
+        <button
+          type="button"
+          id="card-close"
+          class="card-close"
+          aria-label="Fechar painel do cartão"
+        >
+          ×
+        </button>
+      </header>
+
+      <label class="card-field">
+        <span>Frente</span>
+        <input type="text" id="card-front" autocomplete="off" spellcheck="false" />
+      </label>
+
+      <label class="card-field">
+        <span>Verso <em>(opcional)</em></span>
+        <textarea
+          id="card-back"
+          rows="2"
+          placeholder="Digite o verso do cartão"
+        ></textarea>
+      </label>
+
+      <label class="card-check">
+        <input type="checkbox" id="card-include-context" checked />
+        <span>Incluir a frase no verso</span>
+      </label>
+
+      <p id="card-context" class="card-context" hidden></p>
+
+      <div class="card-actions">
+        <button type="button" id="card-share" class="card-primary">
+          Enviar ao AnkiDroid
+        </button>
+        <button type="button" id="card-download" class="secondary">
+          Baixar arquivo
+        </button>
+      </div>
+
+      <p id="card-hint" class="card-hint" hidden>
+        O envio direto exige HTTPS. Aqui, use “Baixar arquivo” e importe no Anki.
+      </p>
+
+      <p id="card-status" class="card-status" role="status" aria-live="polite"></p>
+
+    </aside>
+
   </section>
 
   <script type="module" src="/app.js"></script>

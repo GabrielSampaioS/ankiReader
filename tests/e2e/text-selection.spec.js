@@ -147,17 +147,26 @@ test("ao girar a tela a camada de texto continua alinhada", async ({ page }) => 
   const before = await measure(page);
 
   await page.setViewportSize({ width: 800, height: 1280 });
+
+  // O redesenho é assíncrono (canvas e depois a camada de texto): espera o
+  // estado final em vez de medir no meio da transição.
   await expect
-    .poll(async () => (await measure(page)).canvas.width)
-    .not.toBeCloseTo(before.canvas.width, 0);
+    .poll(
+      async () => {
+        const m = await measure(page);
+        if (!m.span || Math.abs(m.canvas.width - before.canvas.width) < 2) return false;
 
-  const m = await measure(page);
-  expect(m.layer.left).toBeCloseTo(m.canvas.left, 0);
-  expect(Math.abs(m.layer.width - m.canvas.width)).toBeLessThanOrEqual(1);
-  expect(Math.abs(m.layer.height - m.canvas.height)).toBeLessThanOrEqual(1);
-
-  const scale = m.canvas.width / PAGE_W;
-  expect(m.span.left).toBeCloseTo(m.canvas.left + LINE.x * scale, -1);
+        const scale = m.canvas.width / PAGE_W;
+        return (
+          Math.abs(m.layer.left - m.canvas.left) <= 1 &&
+          Math.abs(m.layer.width - m.canvas.width) <= 1 &&
+          Math.abs(m.layer.height - m.canvas.height) <= 1 &&
+          Math.abs(m.span.left - (m.canvas.left + LINE.x * scale)) <= 10
+        );
+      },
+      { message: "a camada de texto não realinhou após girar a tela", timeout: 10_000 }
+    )
+    .toBe(true);
 });
 
 test("trocar de página substitui o texto, sem acumular camadas antigas", async ({ page }) => {

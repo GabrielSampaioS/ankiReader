@@ -8,6 +8,7 @@ import {
 import { generateCover } from "/src/reader/cover-generator.js";
 import { PdfViewer } from "/src/reader/pdf-viewer.js";
 import { resolveEdgeAction } from "/src/reader/reader-math.mjs";
+import { createCardPanel } from "/src/anki/card-panel.js";
 
 // ---------- Configurações ----------
 
@@ -45,6 +46,13 @@ const viewer = new PdfViewer({
   container: elements.stage,
   canvas: elements.canvas,
   onPageChange: handlePageChange,
+});
+
+// ---------- Painel do cartão do Anki ----------
+
+const cardPanel = createCardPanel({
+  textLayer: document.getElementById("text-layer"),
+  isReaderActive: () => state.currentBookId !== null,
 });
 
 // ---------- Biblioteca ----------
@@ -183,6 +191,7 @@ async function closeBook() {
   }
 
   state.currentBookId = null;
+  cardPanel.close();
 
   elements.reader.classList.add("hidden");
   document.body.classList.remove("reading");
@@ -197,6 +206,9 @@ async function closeBook() {
 
 function handlePageChange(page, total) {
   updatePageControls(page, total);
+
+  // Trocar de página limpa a seleção; o cartão em edição não faz mais sentido.
+  cardPanel.close();
 
   if (!state.currentBookId) return;
 
