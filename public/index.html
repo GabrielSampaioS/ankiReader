@@ -158,10 +158,13 @@
 
    <main id="stage" class="reader-stage">
 
-  <canvas id="page-canvas"></canvas>
+  <!-- A página: canvas e camada de texto dividem exatamente o mesmo retângulo -->
+  <div id="page-container" class="pdf-page">
+    <canvas id="page-canvas"></canvas>
 
-  <!-- Camada de texto selecionável -->
-  <div id="text-layer" class="textLayer"></div>
+    <!-- Camada de texto selecionável -->
+    <div id="text-layer" class="textLayer"></div>
+  </div>
 
   <!-- Zonas de navegação -->
   <button
