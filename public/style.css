@@ -644,15 +644,21 @@ body.reading {
   touch-action: pan-y;
 }
 
-#page-canvas {
-  display: block;
-
-  max-width: 100%;
-  max-height: 100%;
+/* Retângulo da página. O tamanho é definido em pixels pelo pdf-viewer.js,
+   e canvas + camada de texto o preenchem (ficam sempre alinhados). */
+.pdf-page {
+  position: relative;
+  flex: none;
 
   background: white;
 
   box-shadow: 0 5px 35px rgba(0, 0, 0, 0.25);
+}
+
+#page-canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
 }
 
 
@@ -784,33 +790,15 @@ body.reading {
 
 
 /* ========================================
-   Renderizar conteudo em cima do cana
+   CAMADA DE TEXTO (seleção)
 ======================================== */
 
-#stage {
-  position: relative;
-}
+/* O layout da camada vem de vendor/pdfjs/web/pdf_viewer.css (.textLayer).
+   Ele depende das variáveis --total-scale-factor e --scale-round-x/y,
+   definidas pelo pdf-viewer.js no .pdf-page a cada renderização.
+   Não sobrescreva position/inset/font-size dos spans aqui. */
 
-#page-canvas {
-  position: absolute;
-}
-
-#text-layer {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  line-height: 1;
-  transform-origin: 0 0;
-}
-
-#text-layer span {
-  color: transparent;
-  position: absolute;
-  white-space: pre;
-  cursor: text;
-  transform-origin: 0 0;
-}
-
-#text-layer ::selection {
-  background: rgba(0, 120, 215, 0.3);
+.reader-stage .textLayer {
+  user-select: text;
+  -webkit-user-select: text;
 }

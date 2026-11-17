@@ -16,6 +16,7 @@ export class PdfViewer {
   #page = 1;
   #renderToken = 0;
   #task = null;
+  #pageContainer;
   #textLayerContainer;
   #textLayer;
 
@@ -23,7 +24,9 @@ export class PdfViewer {
     this.#container = container;
     this.#canvas = canvas;
     this.#onPageChange = onPageChange;
-    this.#textLayerContainer = this.#canvas.parentElement.querySelector("#text-layer");
+    // Wrapper (.pdf-page) que contém o canvas e a camada de texto.
+    this.#pageContainer = this.#canvas.parentElement;
+    this.#textLayerContainer = this.#pageContainer.querySelector("#text-layer");
   }
 
   get page() {
@@ -91,6 +94,12 @@ export class PdfViewer {
       await task.destroy();
     }
 
+    if (this.#textLayer) {
+      this.#textLayer.cancel();
+      this.#textLayer = null;
+    }
+    this.#textLayerContainer.innerHTML = "";
+
     this.#canvas.width = 0;
     this.#canvas.height = 0;
   }
@@ -156,11 +165,26 @@ export class PdfViewer {
   // Resolução extra para telas de alta densidade.
   const dpr = window.devicePixelRatio || 1;
 
+  const cssWidth = Math.floor(viewport.width);
+  const cssHeight = Math.floor(viewport.height);
+
   this.#canvas.width = Math.floor(viewport.width * dpr);
   this.#canvas.height = Math.floor(viewport.height * dpr);
 
-  this.#canvas.style.width = `${Math.floor(viewport.width)}px`;
-  this.#canvas.style.height = `${Math.floor(viewport.height)}px`;
+  this.#canvas.style.width = `${cssWidth}px`;
+  this.#canvas.style.height = `${cssHeight}px`;
+
+  // O wrapper tem exatamente o tamanho da página; o canvas e a camada de
+  // texto o preenchem. Sem isso a camada de texto ocuparia o palco inteiro
+  // e as palavras apareceriam deslocadas em relação ao que se vê.
+  this.#pageContainer.style.width = `${cssWidth}px`;
+  this.#pageContainer.style.height = `${cssHeight}px`;
+
+  // O pdf_viewer.css dimensiona fonte e posição da camada de texto com estas
+  // variáveis. Se não existirem, as fontes ficam com tamanho errado.
+  this.#pageContainer.style.setProperty("--total-scale-factor", String(viewport.scale));
+  this.#pageContainer.style.setProperty("--scale-round-x", "1px");
+  this.#pageContainer.style.setProperty("--scale-round-y", "1px");
 
   // Renderiza o Canvas.
   const task = page.render({

@@ -234,6 +234,11 @@ function handleStageClick(event) {
     return;
   }
 
+  // Terminar de selecionar um texto também dispara "click": não vira página.
+  if (window.getSelection()?.toString()) {
+    return;
+  }
+
   const rect = elements.stage.getBoundingClientRect();
 
   const action = resolveEdgeAction({

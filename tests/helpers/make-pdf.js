@@ -18,10 +18,14 @@ const PAGE_COLORS_RGB = COLORS.map(([r, g, b]) => [
 ]);
 
 /**
- * @param {{ pages?: number, width?: number, height?: number }} options
+ * @param {{
+ *   pages?: number, width?: number, height?: number,
+ *   text?: { str: string, x: number, y: number, size?: number }[]
+ * }} options  `text` desenha linhas de texto (Helvetica) em todas as páginas;
+ *   x e y seguem o PDF: origem no canto inferior esquerdo, em pontos.
  * @returns {Buffer}
  */
-function makePdf({ pages = 5, width = 612, height = 792 } = {}) {
+function makePdf({ pages = 5, width = 612, height = 792, text = [] } = {}) {
   if (pages < 1 || pages > COLORS.length) {
     throw new Error(`makePdf suporta de 1 a ${COLORS.length} páginas`);
   }
@@ -30,6 +34,9 @@ function makePdf({ pages = 5, width = 612, height = 792 } = {}) {
   // 1: catálogo, 2: árvore de páginas; páginas e conteúdos vêm depois.
   const pageObjectIds = [];
   for (let i = 0; i < pages; i++) pageObjectIds.push(3 + i * 2);
+
+  const fontId = 3 + pages * 2;
+  objects[fontId] = "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>";
 
   objects[1] = "<< /Type /Catalog /Pages 2 0 R >>";
   objects[2] =
@@ -41,11 +48,17 @@ function makePdf({ pages = 5, width = 612, height = 792 } = {}) {
     const pageId = 3 + i * 2;
     const contentId = pageId + 1;
     const [r, g, b] = COLORS[i];
-    const stream = `${r} ${g} ${b} rg 0 0 ${width} ${height} re f`;
+    let stream = `${r} ${g} ${b} rg 0 0 ${width} ${height} re f`;
+
+    for (const { str, x, y, size = 18 } of text) {
+      const safe = str.replace(/[\\()]/g, "\\$&");
+      stream += `\nBT 0 0 0 rg /F1 ${size} Tf ${x} ${y} Td (${safe}) Tj ET`;
+    }
 
     objects[pageId] =
       `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${width} ${height}] ` +
-      `/Contents ${contentId} 0 R /Resources << >> >>`;
+      `/Contents ${contentId} 0 R ` +
+      `/Resources << /Font << /F1 ${fontId} 0 R >> >> >>`;
     objects[contentId] =
       `<< /Length ${Buffer.byteLength(stream)} >>\nstream\n${stream}\nendstream`;
   }
